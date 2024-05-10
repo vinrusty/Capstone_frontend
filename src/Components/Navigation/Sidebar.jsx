@@ -9,17 +9,25 @@ function Sidebar() {
             <Flex p="2rem" alignItems="center" as={Link} to="/">
                 <Text fontSize='3xl'>GreenStride</Text>
             </Flex>
-            <Flex px="2rem" py="1rem" alignItems="center" as={Link} gap="10px" to="/create">
+            <Flex px="2rem" py="1rem" alignItems="center" as={Link} to="/electronics" gap="10px">
                 <Image src='/images_white/create.png' height="30px" />
-                <Text fontSize='lg'>Create</Text>
+                <Text fontSize='lg'>Electronics</Text>
+            </Flex>
+            <Flex px="2rem" py="1rem" alignItems="center" as={Link} to="/transport" gap="10px">
+                <Image src='/images_white/create.png' height="30px" />
+                <Text fontSize='lg'>Transport</Text>
             </Flex>
             <Flex px="2rem" py="1rem" alignItems="center" as={Link} gap="10px" to="/dashboard">
                 <Image src='/images_white/dashboard.png' height="30px" />
                 <Text fontSize='lg'>My Dashboard</Text>
             </Flex>
-            <Flex px="2rem" py="1rem" alignItems="center" as={Link} gap="10px" to="/reports">
+            <Flex px="2rem" py="1rem" alignItems="center" as={Link} gap="10px" to="/records">
                 <Image src='/images_white/report.png' height="30px" />
-                <Text fontSize='lg'>Reports</Text>
+                <Text fontSize='lg'>Records</Text>
+            </Flex>
+            <Flex px="2rem" py="1rem" alignItems="center" as={Link} gap="10px" to="/sensors">
+                <Image src='/images_white/sensor.png' height="30px" />
+                <Text fontSize='lg'>Sensor Data</Text>
             </Flex>
             
             

@@ -1,13 +1,13 @@
 import React from 'react'
 import { Legend, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from 'recharts'
 
-function RadialChart({data}) {
+function RadialChart({data, type}) {
 
   return (
     <div>
         <RadarChart outerRadius={90} width={500} height={400} data={data}>
             <PolarGrid />
-            <PolarAngleAxis dataKey="product" />
+            <PolarAngleAxis dataKey={type} />
             <PolarRadiusAxis angle={0} />
             <Legend />
             

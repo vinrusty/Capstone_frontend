@@ -66,11 +66,11 @@ function Login() {
         <Flex direction="column" p="2rem" background='rgb(4 10 8)' color="white" height="100vh">
             <Box mt="85px">
                 <FormLabel requiredIndicator>Email</FormLabel>
-                <Input type="email" variant="filled" placeholder='Enter your Email' onChange={(e) => setEmail(e.target.value)} />
+                <Input type="email" variant="outline" placeholder='Enter your Email' onChange={(e) => setEmail(e.target.value)} />
             </Box>
             <Box mt="20px">
                 <FormLabel requiredIndicator>Password</FormLabel>
-                <Input type="password" variant="filled" placeholder='Enter your Password' onChange={(e) => setPassword(e.target.value)} />
+                <Input type="password" variant="outline" placeholder='Enter your Password' onChange={(e) => setPassword(e.target.value)} />
             </Box>
             <Button colorScheme='teal' mt="20px" onClick={onSubmitLogin}>Login</Button>
         </Flex>

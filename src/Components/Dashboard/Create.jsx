@@ -89,7 +89,7 @@ function Create() {
             c,
             d,
             goal_consumption: goal,
-            fuel_type: fuel
+            fuel_type: v === '2 Wheeler' ? 'Petrol' : fuel
         })
         const data = await result.data
         console.log(data)
@@ -109,7 +109,7 @@ function Create() {
             product: appl,
             location: authState.user.locality,
             usage: hours,
-            prediction: firstResultTransport,
+            prediction: firstResult,
             morning: sliderValue1,
             afternoon: sliderValue2,
             evening: sliderValue3,
@@ -147,7 +147,7 @@ function Create() {
             email: authState.user.email,
             location: authState.user.locality,
             usage: kilometers,
-            prediction: firstResult,
+            prediction: firstResultTransport,
             morning: sliderValue1,
             afternoon: sliderValue2,
             evening: sliderValue3,
@@ -200,12 +200,12 @@ function Create() {
                         
                         {
                             appl == '' ?
-                            <></>
+                            <Box height="100vh"></Box>
                             :
                             <Flex direction="column" padding="2rem">
                                 <Text>{appl}</Text>
                                 <FormLabel mt="20px" color="teal">Hours</FormLabel>
-                                <Input type="text" variant="filled" onChange={(e) => setHours(e.target.value)} placeholder='Enter the number of hours used' />
+                                <Input type="text" variant="outline" onChange={(e) => setHours(e.target.value)} placeholder='Enter the number of hours used' />
                                 <Button colorScheme='green' width="100px" mt="20px" onClick={() => eletricalAppliance(appl)}>Submit</Button>
                             </Flex>
                         }
@@ -400,19 +400,19 @@ function Create() {
                         </Box>
                     </TabPanel>
                     <TabPanel>
-                        <Select placeholder='Select Vehicles' onChange={(e) => setVehicle(e.target.value)}>
+                        <Select placeholder='Select Vehicles' color="black" background="white" onChange={(e) => setVehicle(e.target.value)}>
                             <option value='2 Wheeler'>2 Wheeler</option>
                             <option value='4 Wheeler'>4 Wheeler</option>
                         </Select>
                         <Input type="date" onChange={(e) => setDate(e.target.value)} placeholder='Select date' mt="10px"/>
                         {
                             vehicle == '' ?
-                            <></>
+                            <Box height="100vh"></Box>
                             :
                             <Flex direction="column" padding="2rem">
-                                <Text>2 Wheeler</Text>
+                                <Text>{vehicle}</Text>
                                 <FormLabel mt="20px" color="teal">Kilometers</FormLabel>
-                                <Input type="text" variant="filled" placeholder='Enter the number of kilometers travelled' onChange={(e) => setKilometers(e.target.value)} />
+                                <Input type="text" variant="outline" placeholder='Enter the number of kilometers travelled' onChange={(e) => setKilometers(e.target.value)} />
                                 <Button colorScheme='green' width="100px" mt="20px" onClick={() => vehicleCalculation(vehicle)}>Submit</Button>
                             </Flex>
                         }
@@ -509,16 +509,23 @@ function Create() {
                                             <SliderThumb />
                                         </Slider>
                                     </Flex>
-                                    <Flex gap="20px" mt="30px">
-                                        <FormLabel width="100px">Fuel type</FormLabel>
-                                        <Select onChange={(e) => setFuelType(e.target.value)} placeholder='Select Fuel type'>
-                                            <option value="petrol">Petrol</option>
-                                            <option value="diesel">Diesel</option>
-                                        </Select>
-                                    </Flex>
+                                    
+                                        <Flex gap="20px" mt="30px">
+                                            <FormLabel width="100px">Fuel type</FormLabel>
+                                            <Select onChange={(e) => setFuelType(e.target.value)} placeholder='Select Fuel type'>
+                                                <option value="Petrol">Petrol</option>
+                                                {
+                                                    vehicle === '2 Wheeler' ?
+                                                    <option value="Diesel">Diesel</option>
+                                                    :
+                                                    <></>
+                                                }
+                                            </Select>
+                                        </Flex>
+                                    
                                 </Box>
                                 <Box>
-                                    <Button mt="20px" colorScheme='green' onClick={() => getRecommendationTransport(vehicle, sliderValue1, sliderValue2, sliderValue3, sliderValue4, newResult, fuelType)}>Recommend</Button>
+                                    <Button mt="20px" colorScheme='green' onClick={() => getRecommendationTransport(vehicle, sliderValue1, sliderValue2, sliderValue3, sliderValue4, newResultTransport, fuelType)}>Recommend</Button>
                                 </Box>
                             </Flex>
                         }

@@ -208,7 +208,7 @@ function Reports() {
                     </Box>
                     <Box textAlign="right">
                       <Text fontSize="lg" mt="10px">{userStats.totalUsage}</Text>
-                      <Text fontSize="lg">{userStats.totalPrediction}</Text>
+                      <Text fontSize="lg">{Number(userStats.totalPrediction).toFixed(2)}</Text>
                     </Box>
                   </Flex>
                   
@@ -358,7 +358,7 @@ function Reports() {
                         </Box>
                         <Box textAlign="right">
                           <Text color="white" fontWeight="bold">Stats</Text>
-                          <Text color="purple" fontWeight="bold">{val.usage.avg}</Text>
+                          <Text color="purple" fontWeight="bold">{Number(val.usage.avg).toFixed(2)}</Text>
                           <Text color="green" fontWeight="bold">{val.usage.min}</Text>
                           <Text color="teal" fontWeight="bold">{val.usage.max}</Text>
                         </Box>
@@ -401,7 +401,7 @@ function Reports() {
               <Box mt="30px" borderColor="rgba(0,73,64,1)" borderWidth="1px" borderRadius="20px" padding="1.6rem">
                 <Text color="white" textAlign="center">Statistics by Products</Text>
                 <Box mt="10px"></Box>
-                <RadialChart data={statsProduct.products} />
+                <RadialChart data={statsProduct.products} type="product" />
                 <Box mt="10px"></Box>
               </Box>
               {
@@ -409,7 +409,7 @@ function Reports() {
                 <Box mt="30px" borderColor="rgba(0,73,64,1)" borderWidth="1px" borderRadius="20px" padding="1.6rem">
                   <Text color="white" textAlign="center">Statistics by Location</Text>
                   <Box mt="10px"></Box>
-                  <RadialChart data={statsProduct.locations} />
+                  <RadialChart data={statsProduct.locations} type="location" />
                   <Box mt="10px"></Box>
                 </Box>
                 :

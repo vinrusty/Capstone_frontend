@@ -3,17 +3,20 @@ import {Flex, Heading, Text, Button, VStack} from '@chakra-ui/react'
 import { Link } from 'react-router-dom'
 import { RootState } from '../../Context/Context'
 import Cookies from 'universal-cookie'
+import { useNavigate } from 'react-router-dom'
 
 function Navbar() {
 
   const {authState, authDispatch} = RootState()
   const cookies = new Cookies()
+  const navigate = useNavigate()
 
   const onLogout = () => {
     cookies.remove('token')
     authDispatch({
       action: "LOGOUT"
     })
+    window.location.replace("/")
   }
 
 
@@ -33,9 +36,7 @@ function Navbar() {
                 </Flex>
                 :
                 <Flex alignItems="center" justifyContent="center" gap="20px">
-                    <Link to="/">Home</Link>
-                    <Link to="/dashboard">Dashboard</Link>
-                    <Text>About Us</Text>
+                    
                 </Flex>
               }
         </Flex>

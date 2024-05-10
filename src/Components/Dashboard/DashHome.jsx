@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Flex, Button, Select, Center } from '@chakra-ui/react'
 import { Box, Image, Text, VStack } from "@chakra-ui/react";
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Sidebar from '../Navigation/Sidebar'
 import { locations } from './Locations'
 import axios from 'axios'
@@ -16,6 +16,7 @@ function DashHome() {
   const [filterParameters, setFilterParameters] = useState({})
   const cookies = new Cookies()
   const {authState, authDispatch} = RootState()
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +34,7 @@ function DashHome() {
         authDispatch({
           type: "LOGOUT"
         });
-        window.location.replace("/");
+        navigate("/")
       }
     };
   
@@ -141,9 +142,9 @@ function DashHome() {
               </Flex>
           {
             filterRecords.length === 0 ?
-            <>
+            <Box height="100vh">
               <Text mt="30px">No records</Text>
-            </>
+            </Box>
             :
             <>
               <Box mt="30px"></Box>
@@ -158,7 +159,7 @@ function DashHome() {
                       boxShadow="lg"
                       as={Link}
                       borderColor="rgba(0,73,64,1)"
-                      to={`/dashboard/${item.id}`}
+                      to={`/records/${item.id}`}
                       background="radial-gradient(circle, rgba(0,73,64,1) 0%, rgba(0,0,0,1) 100%)"
                     >
                       <Center p="2rem">

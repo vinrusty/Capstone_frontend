@@ -1,0 +1,311 @@
+import React, { useState } from 'react'
+import { Flex, Input, FormLabel, Text, Button, Select, Box, Image } from '@chakra-ui/react'
+import { Tabs, TabList, TabPanels, Tab, TabPanel, useToast } from '@chakra-ui/react'
+import {v4 as uuid} from 'uuid'
+import axios from 'axios';
+import { locations } from './Locations';
+import {
+    Slider,
+    SliderTrack,
+    SliderFilledTrack,
+    SliderThumb,
+    SliderMark,
+  } from '@chakra-ui/react'
+import { RootState } from '../../Context/Context';
+import Sidebar from '../Navigation/Sidebar'
+
+function Transport() {
+
+  const [appl, setAppl] = useState('');
+  const [vehicle, setVehicle] = useState('');
+  const [hours, setHours] = useState(0);
+  const [kilometers, setKilometers] = useState(0);
+  const [firstResult, setFirstResult] = useState(0);
+  const [newResult, setNewResult] = useState(firstResult);
+  const [firstResultTransport, setFirstResultTransport] = useState(0);
+  const [newResultTransport, setNewResultTransport] = useState(firstResult);
+  const [sliderValue1, setSliderValue1] = useState(0)
+  const [sliderValue2, setSliderValue2] = useState(0)
+  const [sliderValue3, setSliderValue3] = useState(0)
+  const [sliderValue4, setSliderValue4] = useState(0)
+  const [recommendedValue, setRecommendedValue] = useState(null);
+  const [fuelType, setFuelType] = useState("electricity");
+  const [date, setDate] = useState('')
+  const toast = useToast();
+  const {authState} = RootState()
+
+  const vehicleCalculation = async (v) =>{
+    try{
+        const result = await axios.post(`http://localhost:8000/predict/${v}`, {
+            hours: kilometers
+        })
+        const data = await result.data
+        console.log(data)
+        setFirstResultTransport(Number(data.prediction).toFixed(2))
+        setNewResultTransport(Number(data.prediction).toFixed(2))
+    }
+    catch(err){
+        console.error(err)
+    }
+  }
+
+  const getRecommendationTransport = async(v, a, b, c, d, goal, fuel) => {
+    try{
+        const result = await axios.post(`http://localhost:8000/rl/transport/${v}`, {
+            a,
+            b,
+            c,
+            d,
+            goal_consumption: goal,
+            fuel_type: v === '2 Wheeler' ? 'Petrol' : fuel
+        })
+        const data = await result.data
+        console.log(data)
+        setRecommendedValue(data)
+    }
+    catch(err){
+        console.error(err)
+    }
+  }
+
+
+  const createVehicleEmmisionRecord = async() => {
+    try{
+        const result = await axios.post("http://localhost:3001/record/create-emission-record", {
+            id: uuid(),
+            product: vehicle,
+            email: authState.user.email,
+            location: authState.user.locality,
+            usage: kilometers,
+            prediction: firstResultTransport,
+            morning: sliderValue1,
+            afternoon: sliderValue2,
+            evening: sliderValue3,
+            night: sliderValue4,
+            recommendation: recommendedValue,
+            fuelType: fuelType,
+            date: date
+        })
+        const data = await result.data
+        console.log(data)
+        if(data.message === "success"){
+            toast({
+                title: "Record saved successfully",
+                description: "Successfully created record for the appliance",
+                status: "success"
+            })
+        }
+        else{
+            toast({
+                title: "Unsuccessful in saving record",
+                status: "error"
+            })
+        }
+    }
+    catch(err){
+        console.error(err)
+    }
+  }
+
+
+  return (
+    <div style={{background: "rgb(4 10 8)"}}>
+        <Sidebar />
+        <Flex alignItems="center" ml="260px" justifyContent="center" direction="column" p="2rem" background="rgb(4 10 8)" color="white">
+            <Box mt="85px"></Box>
+                        <Select placeholder='Select Vehicles' color="black" background="white" onChange={(e) => setVehicle(e.target.value)}>
+                            <option value='2 Wheeler'>2 Wheeler</option>
+                            <option value='4 Wheeler'>4 Wheeler</option>
+                        </Select>
+                        <Input type="date" onChange={(e) => setDate(e.target.value)} placeholder='Select date' mt="10px"/>
+                        {
+                            vehicle == '' ?
+                            <Box height="100vh"></Box>
+                            :
+                            <Flex direction="column" padding="2rem" width="100%">
+                                <Text>{vehicle}</Text>
+                                <FormLabel mt="20px" color="teal">Kilometers</FormLabel>
+                                <Input type="text" variant="outline" placeholder='Enter the number of kilometers travelled' onChange={(e) => setKilometers(e.target.value)} />
+                                <Button colorScheme='green' width="100px" mt="20px" onClick={() => vehicleCalculation(vehicle)}>Submit</Button>
+                            </Flex>
+                        }
+                        <>
+                        {
+                            firstResultTransport === 0?
+                            <></>
+                            :
+                            <Flex direction="column" justifyContent="center" alignItems="center" p="2rem" width="100%">
+                                <Text fontSize="2xl" color="teal">Result - {newResultTransport}</Text>
+                                <Flex mt="20px" gap="20px">
+                                    <Button colorScheme='blue' onClick={() => setNewResultTransport(firstResultTransport - firstResultTransport*0.05)}>Reduce 5%</Button>
+                                    <Button colorScheme='blue' onClick={() => setNewResultTransport(firstResultTransport - firstResultTransport*0.1)}>Reduce 10%</Button>
+                                    <Button colorScheme='blue' onClick={() => setNewResultTransport(firstResultTransport - firstResultTransport*0.15)}>Reduce 15%</Button>
+                                </Flex>
+                                <Box mt="30px" p="2rem" width="100%">
+                                    <Flex gap="20px">
+                                        <FormLabel width="100px">Morning</FormLabel>
+                                        <Slider aria-label='slider-ex-1' defaultValue={0} onChange={(val) => setSliderValue1(val)}>
+                                            <SliderMark
+                                            value={sliderValue1}
+                                            textAlign='center'
+                                            bg='blue.500'
+                                            color='white'
+                                            mt='-10'
+                                            ml='-5'
+                                            w='12'
+                                            >
+                                            {sliderValue1}
+                                            </SliderMark>
+                                            <SliderTrack>
+                                                <SliderFilledTrack />
+                                            </SliderTrack>
+                                            <SliderThumb />
+                                        </Slider>
+                                    </Flex>
+                                    <Flex gap="20px" mt="30px">
+                                        <FormLabel width="100px">Afternoon</FormLabel>
+                                        <Slider aria-label='slider-ex-1' defaultValue={0} onChange={(val) => setSliderValue2(val)}>
+                                            <SliderMark
+                                            value={sliderValue2}
+                                            textAlign='center'
+                                            bg='blue.500'
+                                            color='white'
+                                            mt='-10'
+                                            ml='-5'
+                                            w='12'
+                                            >
+                                            {sliderValue2}
+                                            </SliderMark>
+                                            <SliderTrack>
+                                                <SliderFilledTrack />
+                                            </SliderTrack>
+                                            <SliderThumb />
+                                        </Slider>
+                                    </Flex>
+                                    <Flex gap="20px" mt="30px">
+                                        <FormLabel width="100px">Evening</FormLabel>
+                                        <Slider aria-label='slider-ex-1' defaultValue={0} onChange={(val) => setSliderValue3(val)}>
+                                            <SliderMark
+                                            value={sliderValue3}
+                                            textAlign='center'
+                                            bg='blue.500'
+                                            color='white'
+                                            mt='-10'
+                                            ml='-5'
+                                            w='12'
+                                            >
+                                            {sliderValue3}
+                                            </SliderMark>
+                                            <SliderTrack>
+                                                <SliderFilledTrack />
+                                            </SliderTrack>
+                                            <SliderThumb />
+                                        </Slider>
+                                    </Flex>
+                                    <Flex gap="20px" mt="30px">
+                                        <FormLabel width="100px">Night</FormLabel>
+                                        <Slider aria-label='slider-ex-1' defaultValue={0} onChange={(val) => setSliderValue4(val)}>
+                                            <SliderMark
+                                            value={sliderValue4}
+                                            textAlign='center'
+                                            bg='blue.500'
+                                            color='white'
+                                            mt='-10'
+                                            ml='-5'
+                                            w='12'
+                                            >
+                                            {sliderValue4}
+                                            </SliderMark>
+                                            <SliderTrack>
+                                                <SliderFilledTrack />
+                                            </SliderTrack>
+                                            <SliderThumb />
+                                        </Slider>
+                                    </Flex>
+                                    
+                                        <Flex gap="20px" mt="30px">
+                                            <FormLabel width="100px">Fuel type</FormLabel>
+                                            <Select onChange={(e) => setFuelType(e.target.value)} color="black" background="white" placeholder='Select Fuel type'>
+                                                <option value="Petrol">Petrol</option>
+                                                {
+                                                    vehicle === '2 Wheeler' ?
+                                                    <></>
+                                                    :
+                                                    <option value="Diesel">Diesel</option>
+                                                }
+                                            </Select>
+                                        </Flex>
+                                    
+                                </Box>
+                                <Box>
+                                    <Button mt="20px" colorScheme='green' onClick={() => getRecommendationTransport(vehicle, sliderValue1, sliderValue2, sliderValue3, sliderValue4, newResultTransport, fuelType)}>Recommend</Button>
+                                </Box>
+                            </Flex>
+                        }
+                        </>
+                        {
+                            recommendedValue === null ?
+                            <Box height="100vh"></Box>
+                            :
+                            <>
+                            <Box
+                            width="50%"
+                            borderRadius="lg"
+                            borderWidth="1px"
+                            padding="1.6rem"
+                            boxShadow="xl"
+                            borderColor="rgb(1 255 169)"
+                            >
+                            <Text fontSize="2xl" fontWeight="bold">
+                                Recommended Values
+                            </Text>
+                            
+                            
+                                
+                                <>
+                                <Flex gap="20px" alignItems='center'  width="100%" mt="10px" p="1.2rem">
+                                <Image src='/images/morning.png' height='50px' />
+                                <Box width="100px">
+                                    <Text fontWeight="bold">Morning</Text>
+                                </Box>
+                                <Text>{recommendedValue.Morning} Kilometers</Text>
+                                </Flex>
+                                <Flex gap="20px" alignItems='center'  width="100%" p="1.2rem">
+                                <Image src='/images/afternoon.png' height='50px' />
+                                <Box width="100px">
+                                <Text fontWeight="bold">Afternoon</Text>
+
+                                </Box>
+                                <Text>{recommendedValue.Afternoon} Kilometers</Text>
+                                </Flex>
+                                <Flex gap="20px" alignItems='center'  width="100%" p="1.2rem">
+                                <Image src='/images/evening.png' height='50px' />
+                                <Box width="100px">
+                                <Text fontWeight="bold">Evening</Text>
+
+                                </Box>
+                                <Text>{recommendedValue.Evening} Kilometers</Text>
+                                </Flex>
+                                <Flex gap="20px" alignItems='center'  width="100%" p="1.2rem">
+                                <Image src='/images/night.png' height='50px' />
+                                <Box width="100px">
+                                <Text fontWeight="bold">Night</Text>
+                                </Box>
+                                <Text>{recommendedValue.Night} Kilometers</Text>
+                                </Flex>
+                                </>
+                            
+                            </Box>
+                            <Box width="100%" padding="2rem">
+                                <Button colorScheme='blue' onClick={createVehicleEmmisionRecord}>Create</Button>
+                            </Box>
+                            </>
+                        }
+                    
+            
+        </Flex>
+    </div>
+  )
+}
+
+export default Transport
